@@ -1,0 +1,52 @@
+﻿@using BlazorDapperCRUD.Data
+@page "/videodelete/{videoID:int}"
+@inject IVideoService VideoService
+@inject NavigationManager NavigationManager
+
+<h3>Delete Video</h3>
+<p style="color:red;text-align:center">Are you sure you want to permanently delete this video? THere is no undo!</p>
+<table>
+    <tr>
+        <td>Video Title:</td>
+        <td>@video.Title</td>
+    </tr>
+    <tr>
+        <td>Date Published:</td>
+        <td>@video.DatePublished.ToShortDateString()</td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:center">
+            <input type="button" value="Delete" @onclick="@Delete" />
+            <input type="button" value="Cancel" @onclick="@Cancel" />
+        </td>
+    </tr>
+</table>
+
+@code {
+    [Parameter]
+    public int videoID { get; set; }
+    Video video = new Video();
+
+    protected override void OnInitialized()
+    {
+        video.DatePublished = DateTime.Now;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        video = await VideoService.VideoGetOne(videoID);
+    }
+
+    protected async Task Delete()
+    {
+        await VideoService.VideoDelete(videoID);
+
+        NavigationManager.NavigateTo("/videolist");
+
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/videolist");
+    }
+}
